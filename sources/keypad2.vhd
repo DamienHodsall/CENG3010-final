@@ -41,6 +41,9 @@ architecture main of keypad2 is
 
 begin
 
+    -- rewrite this up so it's sending the output after it goes through all the columns
+    -- probably some stupid state machine thing
+
     C : bclk port map (clk, 1000, clk10us);
     P : pwm port map (clk, 500, 10, check);
 
@@ -53,7 +56,6 @@ begin
     begin
         if rising_edge(clk10us) then
             if check = '0' then
-                -- xcoord <= xcoord(1 to 3) & xcoord(0);
                 prev_state <= state;
                 state <= next_state;
                 case state is
