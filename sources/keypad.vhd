@@ -10,7 +10,7 @@ entity keypad is
         pos : out std_logic_vector(0 to 3);
         keypress : out std_logic
     );
-end keypad2;
+end keypad;
 
 architecture main of keypad is
 

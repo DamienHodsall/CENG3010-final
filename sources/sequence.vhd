@@ -30,60 +30,45 @@ end sequence;
 
 architecture main of sequence is
 
-    signal tempass : std_logic_vector(0 to 15); -- := "0110" & "0111" & "0111" & "0110"; -- 8008, using bcd
-    signal passchar : std_logic_vector(0 to 3);
-    signal detected_int, state : std_logic;
+    constant enter_key : std_logic_vector(0 to 3) := "0000"; -- hacky fix by using the 1 key as the enter key
+
+    signal tempass : std_logic_vector(0 to 15) := password;
+    -- signal passchar : std_logic_vector(0 to 3);
+    signal state : std_logic := '1';
+    signal detected_int : std_logic := '0';
 
 begin
-    
+
+    -- get rid of detected_int for final product, it's really only there for testing
+
     process(keypress)
+        variable passchar : std_logic_vector(0 to 3);
     begin
         if rising_edge(keypress) then
+
             if reset = '1' then
+
                 tempass <= password;
+                passchar := tempass(0 to 3);
                 state <= '1';
                 detected_int <= '0';
+
             elsif enable = '1' then
 
-                passchar <= tempass(0 to 3);
-                tempass <= tempass(4 to 15) & "0011";
+                passchar := tempass(0 to 3);
+                tempass <= tempass(4 to 15) & enter_key;
 
                 -- 0000+
                 -- 0011 but it's in the col that's broken
                 -- 1100
                 -- 1101
 
-                if keyin = "1101" then -- or keyin = "1111" then -- 0011 = enter, 1111 = d (cause the first row doesn't work half the time)
+                if keyin = enter_key and passchar = enter_key then
                     detected_int <= state;
                 elsif keyin /= passchar then
                     state <= '0';
                 end if;
 
-                -- if keyin = "0011" then
-                --     if state = correct then
-                --         detected_int <= '1';
-                --         null;
-                --     end if;
-                -- else
-                --     detected_int <= '0';
-
-                --     case state is
-
-                --         when correct =>
-                --             passchar <= tempass(0 to 3);
-                --             tempass <= tempass(4 to 15) & "0011";
-
-                --             if keyin = passchar then
-                --                 state <= correct;
-                --             else
-                --                 state <= wrong;
-                --             end if;
-
-                --         when wrong =>
-                --             state <= wrong;
-
-                --     end case;
-                -- end if;
             end if;
         end if;
     end process;

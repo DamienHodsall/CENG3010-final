@@ -11,7 +11,9 @@ entity driver is
         cath : out std_logic_vector(0 to 7);
         an : out std_logic_vector(0 to 3);
         ledout : out std_logic;
-        servout : out std_logic
+        servout : out std_logic;
+        char : out std_logic_vector(0 to 3);
+        char2 : out std_logic_vector(0 to 3)
     );
 end driver;
 
@@ -67,20 +69,19 @@ architecture main of driver is
 
     signal clk40us : std_logic := '0';
     signal keypress, checked, detected, button : std_logic := '0';
-    signal key : std_logic_vector(0 to 3);
+    signal key, kseg, kseq, kcar : std_logic_vector(0 to 3);
     signal seg_count : integer range 0 to 3 := 0;
     signal tmp_cath : std_logic_vector(0 to 7) := "11111111";
-    signal cathodes : std_logic_vector(0 to 31) := "11111111111111111111111111111111"; --"11000001110001011100010111000001"; -- change this before it gets you in shit
+    signal cathodes : std_logic_vector(0 to 31) := "11111111111111111111111111111111"; -- "11000001110001011100010111000001"; -- change this before it gets you in shit
 
 begin
 
     Clk0 : bclk port map (clk, 4000, clk40us);
     Key0 : keypad port map (clk, ay, ax, key, keypress);
     Seg0 : keypad2seg port map (clk, key, tmp_cath);
-    Seq0 : sequence port map (button, disp, keypress, key, "0110" & "0111" & "0111" & "0110", checked, detected);
+    Seq0 : sequence port map (button, disp, keypress, key, "1001" & "1001" & "1001" & "1001", checked, detected);
     Srv0 : servo port map (clk, detected, servout);
 
-    -- servout <= detected;
     ledout <= checked;
 
     process(keypress)
