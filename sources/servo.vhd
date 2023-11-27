@@ -36,6 +36,6 @@ begin
 
     Cp : bclk port map (clk, 50000, clkp);
     P : pwm port map (clkp, 20, duty, pin);
-    duty <= 2 when angle = '1' else 1;
+    duty <= 1 when angle = '1' else 2;
 
 end main;
