@@ -16,7 +16,7 @@ use ieee.numeric_bit.all;
 
 -- have a huge buffer filled with "0011" because that's the enter char and it isn't really a char that can be input
 
-    entity sequence is
+entity sequence is
     port (
         reset : in std_logic;
         enable : in std_logic; -- this is so you don't always do password checking. might not be necessary but feels useful
@@ -33,7 +33,6 @@ architecture main of sequence is
     constant enter_key : std_logic_vector(0 to 3) := "0000"; -- hacky fix by using the 1 key as the enter key
 
     signal tempass : std_logic_vector(0 to 15) := password;
-    -- signal passchar : std_logic_vector(0 to 3);
     signal state : std_logic := '1';
     signal detected_int : std_logic := '0';
 
@@ -57,11 +56,6 @@ begin
 
                 passchar := tempass(0 to 3);
                 tempass <= tempass(4 to 15) & enter_key;
-
-                -- 0000+
-                -- 0011 but it's in the col that's broken
-                -- 1100
-                -- 1101
 
                 if keyin = enter_key and passchar = enter_key then
                     detected_int <= state;
