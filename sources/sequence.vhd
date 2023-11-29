@@ -23,22 +23,18 @@ entity sequence is
         keypress : in std_logic; -- whether a key was pressed
         keyin : in std_logic_vector(0 to 3); -- the last key pressed
         password : in std_logic_vector(0 to 15);
-        checked : out std_logic;
         detected : out std_logic := '0' -- whether the correct sequence has been detected
     );
 end sequence;
 
 architecture main of sequence is
 
-    constant enter_key : std_logic_vector(0 to 3) := "0000"; -- hacky fix by using the 1 key as the enter key
+    constant enter_key : std_logic_vector(0 to 3) := "0000";
 
     signal tempass : std_logic_vector(0 to 15) := password;
     signal state : std_logic := '1';
-    signal detected_int : std_logic := '0';
 
 begin
-
-    -- get rid of detected_int for final product, it's really only there for testing
 
     process(keypress)
         variable passchar : std_logic_vector(0 to 3);
@@ -50,7 +46,7 @@ begin
                 tempass <= password;
                 passchar := tempass(0 to 3);
                 state <= '1';
-                detected_int <= '0';
+                detected <= '0';
 
             elsif enable = '1' then
 
@@ -58,7 +54,7 @@ begin
                 tempass <= tempass(4 to 15) & enter_key;
 
                 if keyin = enter_key and passchar = enter_key then
-                    detected_int <= state;
+                    detected <= state;
                 elsif keyin /= passchar then
                     state <= '0';
                 end if;
@@ -66,8 +62,5 @@ begin
             end if;
         end if;
     end process;
-
-    checked <= state;
-    detected <= detected_int;
 
 end architecture;

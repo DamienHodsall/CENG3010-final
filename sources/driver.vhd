@@ -11,8 +11,14 @@ entity driver is
         cath : out std_logic_vector(0 to 7);
         an : out std_logic_vector(0 to 3);
         ledout : out std_logic;
-        servout : out std_logic;
-        servout1 : out std_logic
+        door0 : out std_logic;
+        lock0 : out std_logic;
+        door1 : out std_logic;
+        lock1 : out std_logic;
+        door2 : out std_logic;
+        lock2 : out std_logic;
+        door3 : out std_logic;
+        lock3 : out std_logic
     );
 end driver;
 
@@ -51,19 +57,18 @@ architecture main of driver is
             keypress : in std_logic;
             keyin : in std_logic_vector(0 to 3);
             password : in std_logic_vector(0 to 15);
-            checked : out std_logic;
             detected : out std_logic
         );
     end component;
 
-    component password is
-        port (
-            keypress : in std_logic;
-            key : in std_logic_vector(0 to 3);
-            password : out std_logic_vector(0 to 15);
-            entered : out std_logic
-         );
-    end component;
+    -- component password is
+        -- port (
+            -- keypress : in std_logic;
+            -- key : in std_logic_vector(0 to 3);
+            -- password : out std_logic_vector(0 to 15);
+            -- entered : out std_logic
+         -- );
+    -- end component;
 
     component servo is
         port (
@@ -82,11 +87,34 @@ architecture main of driver is
          );
     end component;
 
-    signal passwd : std_logic_vector(0 to 15) := "0000" & "0000" & "0000" & "0000";
+    component servoman is
+        port (
+            clk : in std_logic;
+            enable : in std_logic;
+            open0 : in std_logic;
+            open1 : in std_logic;
+            open2 : in std_logic;
+            open3 : in std_logic;
+            door0 : out std_logic;
+            lock0 : out std_logic;
+            door1 : out std_logic;
+            lock1 : out std_logic;
+            door2 : out std_logic;
+            lock2 : out std_logic;
+            door3 : out std_logic;
+            lock3 : out std_logic
+         );
+    end component;
+
+    constant enter_key : std_logic_vector(0 to 3) := "0000";
+    constant clear_key : std_logic_vector(0 to 3) := "0011";
+
+    signal passwd0 : std_logic_vector(0 to 15) := "0000" & "0000" & "0000" & "0000";
+    signal passwd1 : std_logic_vector(0 to 15) := "0000" & "0000" & "0000" & "0000";
 
     signal an_int : std_logic_vector(0 to 3) := "1110";
     signal clk40us, clk500ms : std_logic := '0';
-    signal keypress, checked, detected, detected1, button, entered : std_logic := '0';
+    signal keypress, checked, detected0, detected1, clear, entered, mainpass, pass1 : std_logic := '0';
     signal key, kseg, kseq, kcar : std_logic_vector(0 to 3);
     signal seg_count : integer range 0 to 3 := 0;
     signal tmp_cath : std_logic_vector(0 to 7) := "11111111";
@@ -97,55 +125,52 @@ begin
     Clk0 : bclk port map (clk, 4000, clk40us);
     Key0 : keypad port map (clk, ay, ax, key, keypress);
     Seg0 : keypad2seg port map (clk, key, tmp_cath);
-    Seq0 : sequence port map (button, disp, keypress, key, passwd, checked, detected);
-    Pas0 : password port map (keypress, key, passwd, entered);
-    Srv0 : servo port map (clk, detected, servout);
-    Srv1 : servo port map (clk, detected1, servout1);
-    Del0 : delay port map (clk, 500, detected, detected1);
+    Seq0 : sequence port map (clear, mainpass, keypress, key, passwd0, detected0);
+    Seq1 : sequence port map (clear, pass1, keypress, key, passwd1, detected1);
+    -- Pas0 : password port map (keypress, key, passwd0, entered);
+    Srvo : servoman port map (clk, disp, detected0, detected1, '0', '0', door0, lock0, door1, lock1, door2, lock2, door3, lock3);
 
-    ledout <= checked;
-    passwd <= "1000" & "0101" & "1010" & "0110";
+    passwd0 <= "1000" & "0101" & "1010" & "0110"; -- 2487
+    passwd1 <= "0100" & "1000" & "1100" & "0000"; -- 123
+    mainpass <= disp and not detected0;
+    pass1 <= disp and detected0;
 
     process(keypress)
     begin
         if rising_edge(keypress) then
             case key is
-                when "0000" => -- enter key
-                    null;
-                when "0011" => -- clear key
+                when enter_key =>
+                    cathodes <= "11111111111111111111111111111111";
+                when clear_key =>
                     cathodes <= "11111111111111111111111111111111";
                 when others =>
-                    cathodes <= (cathodes(8 to 31) & tmp_cath);
+                    if disp = '1' then
+                        cathodes <= (cathodes(8 to 31) & tmp_cath);
+                    end if;
             end case;
         end if;
     end process;
 
-    button <= '1' when key = "0011" else '0';
+    clear <= '1' when key = clear_key else '0';
 
     process(clk40us)
     begin
         if rising_edge(clk40us) then
-            case seg_count is
-                when 0 =>
-                    seg_count <= 1;
+            case an_int is
+                when "0111" =>
                     an_int <= "1110";
                     cath <= cathodes(24 to 31);
-                when 1 =>
-                    seg_count <= 2;
+                when "1110" =>
                     an_int <= "1101";
                     cath <= cathodes(16 to 23);
-                when 2 =>
-                    seg_count <= 3;
+                when "1101" =>
                     an_int <= "1011";
                     cath <= cathodes(8 to 15);
-                when 3 =>
-                    seg_count <= 0;
+                when "1011" =>
                     an_int <= "0111";
                     cath <= cathodes(0 to 7);
                 when others =>
-                    seg_count <= 0;
-                    an_int <= "1111";
-                    cath <= "11111111";
+                    an_int <= "0111";
             end case;
         end if;
     end process;

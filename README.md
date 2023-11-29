@@ -7,6 +7,7 @@
 - [x] fix the double reset problem (these two seem like they might be connected) (they were)
 - [x] fix the issue where you can enter without a password after clearing a successful opening
 - [ ] slap some stickers on the keypad (avoids rewriting keypad2)
-- [ ] reorder servo activation to lock-door-door-lock instead of lock-door-lock-door
+    - [ ] find someone with good handwriting to label the stickers
+- [x] reorder servo activation to lock-door-door-lock instead of lock-door-lock-door
 - [ ] finish password changing in password.vhd
-- [ ] implement multiple passwords (probably needs state machine)
+- [x] implement multiple passwords (probably needs state machine) (nah, just needed to disable the door0 sequence while checking the inner doors)
