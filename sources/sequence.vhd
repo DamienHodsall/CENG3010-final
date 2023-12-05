@@ -53,8 +53,14 @@ begin
                 passchar := tempass(0 to 3);
                 tempass <= tempass(4 to 15) & enter_key;
 
-                if keyin = enter_key and passchar = enter_key then
-                    detected <= state;
+                if keyin = enter_key then
+                    if passchar = enter_key then
+                        detected <= state;
+                    else
+                        tempass <= password;
+                        passchar := tempass(0 to 3);
+                        state <= '1';
+                    end if;
                 elsif keyin /= passchar then
                     state <= '0';
                 end if;

@@ -11,3 +11,4 @@
 - [x] reorder servo activation to lock-door-door-lock instead of lock-door-lock-door
 - [ ] finish password changing in password.vhd
 - [x] implement multiple passwords (probably needs state machine) (nah, just needed to disable the door0 sequence while checking the inner doors)
+- [x] fix sequence reset so there are multiple tries to get trough each door (important for the inner doors)

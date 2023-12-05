@@ -36,3 +36,8 @@ set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports {door2}]
 set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports {lock2}]
 set_property -dict {PACKAGE_PIN G2 IOSTANDARD LVCMOS33} [get_ports {door3}]
 set_property -dict {PACKAGE_PIN G3 IOSTANDARD LVCMOS33} [get_ports {lock3}]
+
+set_property -dict {PACKAGE_PIN L1 IOSTANDARD LVCMOS33} [get_ports {open0}]
+set_property -dict {PACKAGE_PIN P1 IOSTANDARD LVCMOS33} [get_ports {open1}]
+set_property -dict {PACKAGE_PIN N3 IOSTANDARD LVCMOS33} [get_ports {open2}]
+set_property -dict {PACKAGE_PIN P3 IOSTANDARD LVCMOS33} [get_ports {open3}]
